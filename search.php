@@ -78,57 +78,76 @@ $no_result = '';
             if (isset($_POST['search'])) {
                 $query = filter_input(INPUT_POST, 'query', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 if (!empty($query)) {
-                    $sql = "SELECT * FROM technicians WHERE name LIKE '%$query%'";
+                    $sql = "SELECT * FROM technicians WHERE name LIKE '%$query%' or job LIKE '%$query%' or address LIKE '%$query%' or email LIKE '%$query%' or phoneNumber LIKE '%$query%' or company LIKE '%$query%'";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute();
                     $result = $stmt->fetchAll();
                     $technician_query_count = $stmt->rowCount();
-                    if ($technician_query_count > 0) {
-                        // echo '<div class="col-md-6">
-                        foreach($result as $log){
-    echo '<div class="col-md-6" >
-          <!-- Card with an image on left -->
-          <div class="card">
-            <div class="row g-0">
-              <div class="col-md-4">
-                <img src="assets/images/'.$log->image.'" class="img-fluid rounded-start" onerror="this.src="assets/img/profile-img.jpg"">
-              </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <h5 class="card-title mb-0">Technician ' . $log->name . '</h5>
-                  <h6><span style="color:purple;margin-bottom:0;">Occupation:</span> '. $log->job . '</h6>
-                  <h6 style="line-height:1.3rem;margin-bottom:0;">Address: ' . $log->address . '</h6>
-                  <h6><span style="color:purple;margin-bottom:0;">Rating:</span> ' . $log->job . '</h6>
-                  <a href="view_profile.php?id='.$log->id.'">View Profile</a>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Card with an image on left -->
-                       </div>';
-}
 
+                    if ($technician_query_count > 0) { ?>
+                        <div class="col-md-6">
+                            <?php foreach ($result as $log) { ?>
+                                <div class="col-12">
+                                    <!-- Card with an image on left -->
+                                    <div class="card">
+                                        <div class="row g-0">
+                                            <div class=" col-md-4">
+                                                <img src="assets/images/<?php echo $log->image; ?>" class="img-fluid rounded-start" onerror="this.src='assets/img/profile-img.jpg'">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h5 class=" my-1">Technician <?php echo $log->name; ?></h5>
+                                                    <h6><span style="color: #012970;margin-bottom:0;margin-top:-20px;font-weight:bolder;">Occupation:</span> <?php echo $log->job; ?></h6>
+                                                    <h6 style="line-height:1.3rem;"><span style="color: #012970;font-weight:bolder;">Address:</span> <?php echo $log->address; ?></h6>
+                                                    <h6><span style="color: #012970;font-weight:bolder;margin-bottom:0;">Rating:</span> <?php echo $log->job; ?></h6>
+                                                    <a href="view_profile.php?username=<?php echo $log->username; ?>">View Profile</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- End Card with an image on left -->
+                                </div>
+                            <?php } ?>
+                        </div>
+                    <?php }
 
-// </div>';
-                    }
-                    $sql = "SELECT * FROM clients WHERE name LIKE '%$query%'";
+                    $sql = "SELECT * FROM clients WHERE name LIKE '%$query%' or address LIKE '%$query%' or phoneNumber LIKE '%$query%'";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute();
                     $result = $stmt->fetchAll();
                     $client_query_count = $stmt->rowCount();
-                    if ($client_query_count > 0) {
-                        foreach ($result as $log) {
-                            echo '<div class="col">
-                                <h5>' . $log->name . '</h5> 
+
+                    if ($client_query_count > 0) { ?>
+                        <div class="col-md-6">
+                            <?php foreach ($result as $log) { ?>
+                                echo '<div class="col-md-6">
+                                    <!-- Card with an image on left -->
+                                    <div class="card">
+                                        <div class="row g-0">
+                                            <div class=" col-md-4">
+                                                <img src="assets/images/<?php echo $log->image; ?>" class="img-fluid rounded-start" onerror="this.src='assets/img/profile-img.jpg'">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <h5 class="card-title mb-0">Technician ' . $log->name . '</h5>
+                                                    <h6><span style="color:purple;margin-bottom:0;">Occupation:</span> ' . $log->job . '</h6>
+                                                    <h6 style="line-height:1.3rem;margin-bottom:0;">Address: ' . $log->address . '</h6>
+                                                    <h6><span style="color:purple;margin-bottom:0;">Rating:</span> ' . $log->job . '</h6>
+                                                    <a href="view_profile.php?username=<?= $log->username ?>">View Profile</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- End Card with an image on left -->
                                 </div>';
-                        }
-                    }
-                    if ($technician_query_count = $client_query_count = 0) {
+                            <?php } ?>
+
+                        </div>
+            <?php }
+
+                    if ($technician_query_count == 0 && $client_query_count == 0) {
                         $no_result = 1;
                     }
                 }
             }
-
-
             ?>
 
         </div>
@@ -138,6 +157,3 @@ $no_result = '';
     <?php include 'inc/footer/footer.php' ?>
 
 </div>
-<?php 
-
-//}
