@@ -16,18 +16,14 @@ if (isset($_SESSION['id'])) {
 } else {
     header("Location: register.php");
 }
-if (isset($_POST['search'])) {
-    $query = filter_Input(INPUT_POST, 'query', FILTER_SANITIZE_SPECIAL_CHARS);
-    $sql = "SELECT * FROM technicians WHERE job LIKE ? or address LIKE ? or name LIKE ? or company LIKE ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['%$query%', '%$query%', '%$query%', '%$query%']);
-    $query_result = $stmt->fetchAll();
-    header("Location: search.php");
-}
-//    $date = "2021-11-01 10:10:05";
-// $newDate = date('Y-m-d H:i:s', strtotime($date . ' -10 minutes'));
-
-// echo $newDate;
+// if (isset($_GET['search'])) {
+//     $query = filter_Input(INPUT_POST, 'query', FILTER_SANITIZE_SPECIAL_CHARS);
+//     $sql = "SELECT * FROM technicians WHERE name LIKE ? ";// or address LIKE ? or name LIKE ? or company LIKE ? or username LIKE ? or email LIKE ?";
+//     $stmt = $pdo->prepare($sql);
+//     $stmt->execute(['%$query%']);//, '%$query%', '%$query%','%$query%','%$query%', '%$query%'
+//     $query_result = $stmt->fetchAll();
+//     header("Location: search.php");
+// }
 
 ?>
 <!DOCTYPE html>
@@ -79,9 +75,9 @@ if (isset($_POST['search'])) {
         </div><!-- End Logo -->
 
         <div class="search-bar justify-content-center">
-            <form class="search-form d-flex align-items-center" method="GET" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>">
-                <input type="text" name="query" placeholder="Enter Search Keyword" title="Enter search keyword">
-                <button type="submit" title="Search" name="search"><i class="bi bi-search"></i></button>
+            <form class="search-form d-flex align-items-center" method="POST" action="search.php">
+                <input type="text" name="query" placeholder="Enter Search Keyword">
+                <button   name="search"><i class="bi bi-search"></i></button>
             </form>
         </div><!-- End Search Bar -->
 
@@ -92,11 +88,11 @@ if (isset($_POST['search'])) {
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
 
-                <li class="nav-item d-block d-lg-none">
+                <!-- <li class="nav-item d-block d-lg-none">
                     <a class="nav-link nav-icon search-bar-toggle " href="#">
                         <i class="bi bi-search"></i>
                     </a>
-                </li><!-- End Search Icon-->
+                </li>End Search Icon --!>
 
                 <li class="nav-item dropdown">
 

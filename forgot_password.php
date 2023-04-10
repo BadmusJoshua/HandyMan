@@ -1,5 +1,17 @@
 <?php
-include_once'inc/config/database.php';
+include_once 'inc/config/database.php';
+//Import PHPMailer classes into the global namespace
+use PHPMailer\PHPMailer\PHPMailer;
+
+$account_not_found = $message_unsent = $message_sent = "";
+
+
+
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+
+
 if (isset($_POST['send_reset'])) {
     //sanitizing input
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -13,6 +25,8 @@ if (isset($_POST['send_reset'])) {
         $sql = "SELECT * FROM technicians WHERE email = ? AND phoneNumber = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$email, $phoneNumber]);
+        $user = $stmt->fetch();
+        $username = $user->name;
         $userCount = $stmt->rowCount();
         if ($userCount > 0) {
 
@@ -21,16 +35,47 @@ if (isset($_POST['send_reset'])) {
             $stmt->execute(array(':token' => $token, ':expires_at' => $expires_at, ':email' => $email, ':phoneNumber' => $phoneNumber));
 
             //creating reset link
-            $reset_link = "http://localhost/NICEADMIN/NiceAdmin/forgot_password.php?token=$token"; //Replace example.com with your domain name
+            $reset_link = "http://localhost/NiceAdmin/HandyMan/forgot_password.php?token=$token";
 
-            //creating reset message
-            $message = "Click on the following link to reset your password: \n\n $reset_link \n\nThis token expires at $expires_at";
-            //sending mail
-            mail($email, "Password Reset", $message);
+
+            //Create an instance; passing `true` enables exceptions
+            $mail = new PHPMailer(true);
+
+            try {
+
+                $mail->isSMTP();                                            //Send using SMTP
+                $mail->Host = 'sandbox.smtp.mailtrap.io';
+                $mail->SMTPAuth = true;
+                $mail->Port = 2525;
+                $mail->Username = '17a1d32f239ef6';
+                $mail->Password = '4bad338b4ab5c1';
+
+                //Recipients
+                $mail->setFrom('handyman@info.com', 'HandyMan');
+                $mail->addAddress($email, $username);     //Add a recipient
+                $mail->addReplyTo('no-reply@info.com', 'handyman no-reply');
+
+
+                //Attachments
+                // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+                // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+                //Content
+                $mail->isHTML(true);                                  //Set email format to HTML
+                $mail->Subject = 'Testing';
+                $mail->Body    = '<div style="width:80%;border:1px solid black; margin:auto;padding:10px;">Click on the following link to reset your password<br> <b> <a href="http://localhost/NiceAdmin/HandyMan/new_password.php?token=' . $token . '">Password Reset<a></b><br>This token expires at ' . $expires_at . '</div>';
+                // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+                $mail->send();
+                $message_sent = 1;
+            } catch (Exception $e) {
+                $message_unsent = 1;
+            }
+            $mail->smtpClose();
         } elseif ($userCount < 1) {
 
             //checking category of user
-            $sql = "SELECT * FROM technicians WHERE email = ? AND phoneNumber = ?";
+            $sql = "SELECT * FROM clients WHERE email = ? AND phoneNumber = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$email, $phoneNumber]);
             $userCount = $stmt->rowCount();
@@ -40,57 +85,59 @@ if (isset($_POST['send_reset'])) {
                 $stmt->execute(array(':token' => $token, ':expires_at' => $expires_at, ':email' => $email, ':phoneNumber' => $phoneNumber));
 
                 //creating reset link
-                $reset_link = "http://localhost/NICEADMIN/NiceAdmin/forgot_password.php?token=$token"; //Replace example.com with your domain name
+                $reset_link = "http://localhost/NiceAdmin/HandyMan/new_password.php?token=$token"; //Replace example.com with your domain name
 
-                //creating reset message
-                $message = "Click on the following link to reset your password: \n\n $reset_link \n\nThis token expires at $expires_at";
-                //sending mail
-                mail($email, "Password Reset", $message);
+                //Create an instance; passing `true` enables exceptions
+                $mail = new PHPMailer(true);
+
+                try {
+
+                    $mail->isSMTP();                                            //Send using SMTP
+                    $mail->Host = 'sandbox.smtp.mailtrap.io';
+                    $mail->SMTPAuth = true;
+                    $mail->Port = 2525;
+                    $mail->Username = '17a1d32f239ef6';
+                    $mail->Password = '4bad338b4ab5c1';
+
+                    //Recipients
+                    $mail->setFrom('handyman@info.com', 'HandyMan');
+                    $mail->addAddress('$email', '$username');     //Add a recipient
+                    $mail->addReplyTo('no-reply@info.com', 'handyman no-reply');
+
+
+                    //Attachments
+                    // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+                    // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+                    //Content
+                    $mail->isHTML(true);                                  //Set email format to HTML
+                    $mail->Subject = 'Testing';
+                    $mail->Body    = '<div style="width:80%;border:1px solid black; margin:auto;">Click on the following link to reset your password: \n\n <b> $reset_link</b>\n\nThis token expires at $expires_at</div>';
+                    // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+                    $mail->send();
+                    $message_sent = 1;
+                    header("Location:login.php");
+                } catch (Exception $e) {
+                    $message_unsent = 1;
+                }
+                $mail->smtpClose();
             } else {
-                echo "Account not found";
+                $account_not_found = 1;
             }
         }
-    } else {
-        echo "You need to provide your email and phone Number so we can confirm it/s you";
     }
 }
 
-
-if (isset($_GET['token'])) {
-    //Check if token is valid
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE password_reset_token = :token AND password_reset_expires_at > NOW()");
-    $stmt->execute(array(':token' => $_GET['token']));
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user) {
-        //Display password reset form
-        echo "<form method='post'>
-                <input type='password' name='new_password' required>
-                <button type='submit'>Reset Password</button>
-              </form>";
-
-        //Update user's password in the database
-        if (isset($_POST['new_password'])) {
-            $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET password = :new_password, password_reset_token = NULL,  password_reset_expires_at = NULL WHERE id = :id");
-            $stmt->execute(array(':new_password' => $new_password, ':id' => $user['id']));
-            echo "Password reset successfully!";
-        }
-    } else {
-        echo "Invalid token!";
-    }
-} else {
-    echo "Token not provided!";
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forget Password</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Pages / Login - NiceAdmin Bootstrap Template</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -110,10 +157,15 @@ if (isset($_GET['token'])) {
     <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
-    <title>Password Recover</title>
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+
 </head>
 
 <body>
+
     <main>
         <div class="container">
 
@@ -123,7 +175,7 @@ if (isset($_GET['token'])) {
                         <div class="col-lg-10 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                             <div class="d-flex justify-content-center py-4">
-                                <a href="index.html" class="logo d-flex align-items-center w-auto">
+                                <a href="login.php" class="logo d-flex align-items-center w-auto">
                                     <img src="assets/img/logo.png" alt="">
                                     <span class=" d-lg-block">Handyman</span>
                                 </a>
@@ -137,15 +189,37 @@ if (isset($_GET['token'])) {
                                         <h5 class="card-title text-center pb-0 fs-4">Help us verify it's you</h5>
                                         <p class="text-center small">Enter your email and phone number to get reset link</p>
                                     </div>
-
+                                    <?php
+                                    if ($message_unsent) {
+                                        echo '< div class="col-12 alert alert-danger text-center alert-dismissible fade show" role="alert">
+                                            Message could not be sent. Mailer Error: {$mail->ErrorInfo}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>';
+                                    }
+                                    if ($message_sent) {
+                                        echo '< div class="col-12 alert alert-success text-center alert-dismissible fade show" role="alert">
+                                            Check your E-mail, your reset link has been sent
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>';
+                                    }
+                                    if ($account_not_found) {
+                                        echo '< div class="col-12 alert alert-danger text-center alert-dismissible fade show" role="alert">
+                                            Account not found!
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>';
+                                    }
+                                    ?>
                                     <form class="row g-3 needs-validation" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" novalidate>
                                         <div class="col-12">
                                             <label for="" class="form-label">Email</label>
-                                            <input type="email" name="email" id="" class="form-control">
+                                            <input type="email" name="email" id="" class="form-control" required>
+                                            <div class="invalid-feedback">Please enter your email!</div>
                                         </div>
                                         <div class="col-12">
                                             <label for="" class="form-label">Phone Number</label>
-                                            <input type="tel" name="phoneNumber" id="" class="form-control">
+                                            <input type="tel" name="phoneNumber" id="" class="form-control" required>
+                                            <div class="invalid-feedback">Please enter your phone number!</div>
+
                                         </div>
                                         <button class="btn btn-primary" name="send_reset">Reset Password</button>
                                     </form>
@@ -157,6 +231,21 @@ if (isset($_GET['token'])) {
             </section>
         </div>
     </main>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="assets/vendor/echarts/echarts.min.js"></script>
+    <script src="assets/vendor/quill/quill.min.js"></script>
+    <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>
