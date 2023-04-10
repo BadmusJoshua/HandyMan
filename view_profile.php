@@ -8,8 +8,9 @@ if (isset($_GET['username'])) {
     $userCount= $stmt->rowCount();
     if ($userCount>0) {
         $user_details=$stmt->fetch();
-        echo $user_details->id;
-        header("Location: view_technician_profile.php?id=$user_details->id");
+        session_start();
+$_SESSION['technician_id'] = $user_details->id;
+        header("Location: view_technician_profile.php");
     }else{
         $sql="SELECT * FROM clients WHERE username = ?";
         $stmt = $pdo->prepare($sql);
@@ -17,8 +18,9 @@ if (isset($_GET['username'])) {
         $userCount = $stmt->rowCount();
         if ($userCount > 0) {
             $user_details = $stmt->fetch();
-            echo $user_details->id;
-            header("Location: view_client_profile.php?id=$user_details->id");
+            session_start();
+            $_SESSION['technician_id'] = $user_details->id;
+            header("Location: view_client_profile.php");
         }
     }
 }

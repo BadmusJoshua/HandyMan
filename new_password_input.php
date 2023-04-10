@@ -145,7 +145,7 @@ if (isset($_SESSION['token'])) {
                                     <form class="row g-3 needs-validation" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" novalidate>
                                         <?php
                                         if ($invalid_token) {
-                                            echo '< div class="col-12 alert alert-danger text-center alert-dismissible fade show" role="alert">
+                                            echo '<div class="col-12 alert alert-danger text-center alert-dismissible fade show" role="alert">
                                             Sorry, your reset token has expired.
                                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                             </div>';
