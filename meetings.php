@@ -12,10 +12,17 @@ if (isset($_POST['schedule'])) {
   $start_time = $_POST['s_time'];
   $finish_time = $_POST['f_time'];
   $meetingwith = $_POST['meeting_people'];
+      if (isset($_POST["reminder"]) && !empty($_POST["reminder"])) {
+        $reminderPermit = $_POST["reminder"];
+        if ($reminderPermit == 'yes') {
+          $reminder = $_POST['reminder_minutes'];
+        }
+        echo "You selected ".$reminder;
+    }
 
-  $sql = 'INSERT INTO meetings (date, start, end, personalities, owner_id) VALUES (?,?,?,?,?)';
+  $sql = 'INSERT INTO meetings (date, start, end, personalities, owner_id, reminder) VALUES (?,?,?,?,?,?)';
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([$input_date, $start_time,  $finish_time, $meetingwith,  $userId]);
+  $stmt->execute([$input_date, $start_time,  $finish_time, $meetingwith,  $userId, $reminder]);
 }
 
 if (isset($_POST['reschedule'])) {
@@ -24,10 +31,17 @@ if (isset($_POST['reschedule'])) {
   $new_start_time = $_POST['new_s_time'];
   $new_finish_time = $_POST['new_f_time'];
   $new_meeting_with = $_POST['new_meeting_people'];
+  if (isset($_POST["reminder"]) && !empty($_POST["reminder"])) {
+        $reminderPermit = $_POST["reminder"];
+        if ($reminderPermit == 'yes') {
+          $reminder = $_POST['reminder_minutes'];
+        }
+        echo "You selected ".$reminder;
+    }
 
-  $sql = "UPDATE meetings SET date = ?, start=?,end=?,personalities=? WHERE id =?";
+  $sql = "UPDATE meetings SET date = ?, start=?,end=?,personalities=?,reminder=? WHERE id =?";
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([$new_input_date, $new_start_time, $new_finish_time, $new_meeting_with, $id]);
+  $stmt->execute([$new_input_date, $new_start_time, $new_finish_time, $new_meeting_with, $reminder, $id]);
 }
 if (isset($_GET['id'])) {
   $id = $_GET['id'];
@@ -75,12 +89,16 @@ $n = 1;
           <div class="row">
             <div class="col">
               <label for="" class="form-label">Set Reminder :</label>
-              <input type="radio" name="reminder" id="">Yes
-              <input type="radio" name="reminder" id="">No
+              <input type="radio" name="reminder" value="yes" id="">Yes
+              <input type="radio" name="reminder" value="no" id="">No
+            </div>
+            <div class="col">
+              <label for="" class="form-label">Venue :</label><br>
+              <input type="time" name="venue" id="" value="<?php echo $log->end ?>">
             </div>
             <div class="col">
               <label for="" class="form-label">When should you be reminded?</label>
-              <select name="reminder-minutes" id="">
+              <select name="reminder_minutes" id="">
                 <option value="10"> 10 minutes before meeting</option>
                 <option value="30">30 minutes before meeting</option>
                 <option value="45">45 minutes before meeting</option>
@@ -223,7 +241,10 @@ $n = 1;
                             <input type="text" name="new_meeting_people" id="" value="<?php echo $log->personalities ?>">
                             <input type="hidden" name="id" value="<?php echo $log->id ?>">
                           </div>
-
+                          <div class="col">
+                            <label for="" class="form-label">Venue :</label><br>
+                            <input type="time" name="venue" id="" value="<?php echo $log->end ?>">
+                          </div>
                         </div>
                         <div class="justify-content-center">
                           <button class="btn btn-success" name="reschedule" id="reschedule_meeting"> Reschedule Meeting</button>
@@ -245,7 +266,7 @@ $n = 1;
                   $year = $date_items[0];
                   $month_index = ($date_items[1] - 1);
                   $day = $date_items[2];
-                  echo " $month[$month_index],$day $year";
+                  echo " $day $month[$month_index], $year";
                   //Creating alarms for meetings
                   //$today = date("F j, Y, g:i,a")
                  // if (

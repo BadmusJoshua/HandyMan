@@ -9,7 +9,11 @@ $salesCount = $stmt->rowCount();
 
 // getting percentage increase of sales
 $prevSalesCount = $salesCount - 1;
-$salesIncrease = (($salesCount - $prevSalesCount) / $salesCount) * 100;
+if ($salesCount != 0){
+  $salesIncrease = (($salesCount - $prevSalesCount) / $salesCount) * 100;
+}else{
+  $salesIncrease =0;
+}
 // echo ;
 // echo ;
 
@@ -267,7 +271,10 @@ if ($totalCustomers != 0) {
 
                 <!-- Line Chart -->
                 <div id="reportsChart"></div>
-
+<?php 
+$sql="SELECT * FROM jobs WHERE seller_id =$userId ";
+$stmt
+?>
                 <script>
                   document.addEventListener("DOMContentLoaded", () => {
                     new ApexCharts(document.querySelector("#reportsChart"), {

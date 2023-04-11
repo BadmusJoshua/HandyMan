@@ -75,6 +75,14 @@ $no_result = '';
     <section class="section dashboard" style="position:relative;">
         <div class="row">
             <?php
+if ($no_result) {
+                echo '<div class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+                          No Result Found! 
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          
+                        </div>  ';
+}
+
             if (isset($_POST['search'])) {
                 $query = filter_input(INPUT_POST, 'query', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 if (!empty($query)) {
@@ -99,7 +107,100 @@ $no_result = '';
                                                     <h5 class=" my-1">Technician <?php echo $log->name; ?></h5>
                                                     <h6><span style="color: #012970;margin-bottom:0;margin-top:-20px;font-weight:bolder;">Occupation:</span> <?php echo $log->job; ?></h6>
                                                     <h6 style="line-height:1.3rem;"><span style="color: #012970;font-weight:bolder;">Address:</span> <?php echo $log->address; ?></h6>
-                                                    <h6><span style="color: #012970;font-weight:bolder;margin-bottom:0;">Rating:</span> <?php echo $log->job; ?></h6>
+                                                    <h6><span style="color: #012970;font-weight:bolder;margin-bottom:0;">Rating:</span> <?php
+                                                                                                                                        $rate = $log->rating;
+                                                                                                                                        echo $rate;
+                                                                                                                                        if ($rate == 0) {
+                                                                                                                                            echo 'No reviews yet';
+                                                                                                                                        } elseif ($rate == 1) {
+                                                                                                                                            echo '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate >= 1.5 && $rate  < 2
+                                                                                                                                        ) {
+                                                                                                                                            echo
+                                                                                                                                            '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star-half"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate == 2
+                                                                                                                                        ) {
+                                                                                                                                            echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate >= 2.5 && $rate < 3
+                                                                                                                                        ) {
+                                                                                                                                            echo
+                                                                                                                                            '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate == 3
+                                                                                                                                        ) {
+                                                                                                                                            echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate >= 3.5 && $rate < 4
+                                                                                                                                        ) {
+                                                                                                                                            echo
+                                                                                                                                            '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate == 4
+                                                                                                                                        ) {
+                                                                                                                                            echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i> 
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                                                                                        } elseif (
+                                                                                                                                            $rate >= 4.5 && $rate < 5
+                                                                                                                                        ) {
+                                                                                                                                            echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    ';
+                                                                                                                                        } else {
+                                                                                                                                            echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>';
+                                                                                                                                        } ?></h6>
                                                     <a href="view_profile.php?username=<?php echo $log->username; ?>">View Profile</a>
                                                 </div>
                                             </div>
@@ -118,28 +219,26 @@ $no_result = '';
 
                     if ($client_query_count > 0) { ?>
                         <div class="col-md-6">
-                            <?php foreach ($result as $log) { ?>
-                                echo '<div class="col-md-6">
+                            <?php foreach ($result as $c_log) { ?>
+                                <div class="col-12">
                                     <!-- Card with an image on left -->
                                     <div class="card">
                                         <div class="row g-0">
                                             <div class=" col-md-4">
-                                                <img src="assets/images/<?php echo $log->image; ?>" class="img-fluid rounded-start" onerror="this.src='assets/img/profile-img.jpg'">
+                                                <img src="assets/images/<?php echo $c_log->image; ?>" class="img-fluid rounded-start" onerror="this.src='assets/img/profile-img.jpg'">
                                             </div>
                                             <div class="col-md-8">
                                                 <div class="card-body">
-                                                    <h5 class="card-title mb-0">Technician ' . $log->name . '</h5>
-                                                    <h6><span style="color:purple;margin-bottom:0;">Occupation:</span> ' . $log->job . '</h6>
-                                                    <h6 style="line-height:1.3rem;margin-bottom:0;">Address: ' . $log->address . '</h6>
-                                                    <h6><span style="color:purple;margin-bottom:0;">Rating:</span> ' . $log->job . '</h6>
-                                                    <a href="view_profile.php?username=<?= $log->username ?>">View Profile</a>
+                                                    <h5 class=" my-1"> <?php echo $c_log->name; ?></h5>
+                                                    <h6 style="line-height:1.3rem;"><span style="color: #012970;font-weight:bolder;">Country:</span> <?php echo $c_log->country; ?></h6>
+                                                    <h6 style="line-height:1.3rem;"><span style="color: #012970;font-weight:bolder;">Address:</span> <?php echo $c_log->address; ?></h6>
+                                                    <a href="view_profile.php?username=<?php echo $c_log->username; ?>">View Profile</a>
                                                 </div>
                                             </div>
                                         </div>
                                     </div><!-- End Card with an image on left -->
-                                </div>';
+                                </div>
                             <?php } ?>
-
                         </div>
             <?php }
 

@@ -4,42 +4,44 @@ $passwordErr = $userNotFound = "";
 
 //checking if cookie exists
 if (isset($_COOKIE['remember_me'])) {
+  echo "cookie";
   list($userid, $token) = explode(':', $_COOKIE['remember_me']);
-  // Look up the token in the database
-  $sql = "SELECT * FROM remember_me_tokens WHERE user_id = ? AND token = ?";
+
+  $sql = "SELECT user_id, expires FROM remember_me_tokens WHERE user_id = ? AND token = ?";
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([$userid, $token]);
-  $row = $stmt->fetch();
-  $userId = $row->user_id;
-  if ($row && time() < $row->expires) {
-    session_start();
-    $_SESSION['id']=$userId;
-    $userId=$_SESSION['id'];
-
-    //using id to fetch user category
-    $sql="SELECT * FROM technicians WHERE id =?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$userId]);
-    $userCount = $stmt->rowCount();
-
-    //if id belongs to a technician
-    if ($userCount>0) {
-      header("Location: index.php");
-    }else{
-      $sql = "SELECT * FROM clients WHERE id =?";
+        session_start();
+        $_SESSION['id']=$userid;
+  if ($stmt->execute([$userid, $token
+  ])) {
+    $row = $stmt->fetch();
+$expire_date= strtotime($row->expires);
+    if ($row && (time() < $expire_date)) {
+      $sql = "SELECT id FROM technicians WHERE id = ?";
       $stmt = $pdo->prepare($sql);
-      $stmt->execute([$userId]);
-      $userCount = $stmt->rowCount();
-      //if id belongs to a client
-      if ($userCount > 0) {
-        header("Location: user-dashboard.php");
-      }else{
-        $userNotFound=1;
+      $stmt->execute([$row->user_id]);
+      $is_technician = ($stmt->rowCount() > 0);
+
+      if ($is_technician) {
+
+        header("Location: index.php");
+      } else {
+        $sql = "SELECT id FROM clients WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$row->user_id]);
+
+        if ($stmt->rowCount() > 0
+        ) {
+          header("Location: user-dashboard.php");
+        }
       }
+    }else{
+      echo "your token has expired, you need to sign in again";
     }
-    
+  } else {
+    // handle database error
   }
 }
+
 if (isset($_POST['login'])) {
   $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
   $input_password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -69,9 +71,9 @@ if (isset($_POST['login'])) {
         $userid = $_SESSION['id']; // Get the user's ID from the database
 
         // Store the token and expiration time in a database table
-        $sql = "INSERT INTO remember_me_tokens (user_id, token) VALUES (?, ?)";
+        $sql = "INSERT INTO remember_me_tokens (user_id, token, expires) VALUES (?, ?,?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$userid, $token]);
+        $stmt->execute([$userid, $token,date('Y-m-d H:i:s', strtotime("+30 days"))]);
 
         //setting cookie on the user browser
         $cookieValue = $userid . ':' . $token;
@@ -101,32 +103,24 @@ if (isset($_POST['login'])) {
       if ($confirm_password) {
 
         //saving the id in a session
-        session_start();
         $_SESSION['id'] = $userId;
 
-        //if user choses to be remembered
         if (isset($_POST['remember'])) {
-          $token = bin2hex(random_bytes(16)); // Generate a random 16-byte token
-          $expires = ('86400*30'); // Set an expiration time of 30 days
-          $userid = $_SESSION['id']; // Get the user's ID from the database
+          if (!empty($_SESSION['id'])) {
+            $userid = $_SESSION['id'];
+            $token = bin2hex(random_bytes(16)); // Generate a random 16-byte token
 
-          // Store the token and expiration time in a database table
-          $sql = "INSERT INTO remember_me_tokens (user_id, token, expires) VALUES (?, ?, ?)";
-          $stmt = $pdo->prepare($sql);
-          $stmt->execute([$userid, $token, $expires]);
+            $sql = "INSERT INTO remember_me_tokens (user_id, token, expires) VALUES (?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
 
-          //setting cookie on the user browser
-          $cookieValue = $userid . ':' . $token;
-          setcookie(
-            'remember_me',
-            $cookieValue,
-            $expires,
-            '/'
-          );
-        }
-        // redirects to client dashboard
-        header("Location: user-dashboard.php");
-      } else {
+            if ($stmt->execute([$userid, $token, date('Y-m-d H:i:s', strtotime("+30 days"))])) {
+              $cookieValue = $userid . ':' . $token;
+              setcookie('remember_me', $cookieValue, time() + 86400 * 30);
+            }
+          }
+          header("Location: user-dsahboard.php");
+          exit;
+        } else {
         $passwordErr = 1;
       }
     }else{
@@ -134,6 +128,8 @@ if (isset($_POST['login'])) {
     }
   }
 }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

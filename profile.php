@@ -192,7 +192,7 @@ if (isset($_POST['changePassword'])) {
               </li>
 
               <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Settings</button>
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Reviews</button>
               </li>
 
               <li class="nav-item">
@@ -221,6 +221,92 @@ if (isset($_POST['changePassword'])) {
                 <div class="row">
                   <div class="col-lg-3 col-md-4 label">Job</div>
                   <div class="col-lg-9 col-md-8"><?php echo $detail->job ?></div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Rating</div>
+                  <div class="col-lg-9 col-md-8"><?php
+                                                  $detail->rating;
+                                                  $rate = $detail->rating;
+
+                                                  if ($rate == 0) {
+                                                    echo 'No reviews yet';
+                                                  } elseif ($rate == 1) {
+                                                    echo '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate >= 1.5 && $rate  < 2) {
+                                                    echo
+                                                    '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star-half"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate == 2) {
+                                                    echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate >= 2.5 && $rate < 3) {
+                                                    echo
+                                                    '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate == 3) {
+                                                    echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate >= 3.5 && $rate < 4) {
+                                                    echo
+                                                    '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate == 4) {
+                                                    echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i> 
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                  } elseif ($rate >= 4.5 && $rate < 5) {
+                                                    echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    ';
+                                                  } else {
+                                                    echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>';
+                                                  }
+                                                  ?></div>
                 </div>
 
                 <div class="row">
@@ -353,43 +439,78 @@ if (isset($_POST['changePassword'])) {
 
               <div class="tab-pane fade pt-3" id="profile-settings">
 
-                <!-- Settings Form -->
-                <form>
+                <?php
+                $sql = "SELECT * FROM reviews WHERE technician_id=? ";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$userId]);
+                $review_count = $stmt->rowCount();
+                if ($review_count == 0) { ?>
+                  <div class="text-center m-auto">No Reviews yet!</div>
+                <?php } else {
+                  $review = $stmt->fetchAll(); ?>
+                  <div>
+                    <?php foreach ($review as $comment) : ?>
+                      <div class="row border p-2">
+                        <div class="col-2 justify-content-center ">
+                          <img src="assets/images/<?= $comment->client_image ?>" alt="" style="height:70px;width:70px;" onerror="this.src='assets/img/profile-img.jpg'" class="rounded-circle">
+                        </div>
+                        <div class="col-10 justify-content-between">
+                          <h5><?= $comment->client_name ?></h5>
+                          <small><?= $comment->created ?></small>
+                        </div>
+                        <div class="col-12"><?= $comment->message ?></div>
+                        <div class="col-12 text-center">
+                          <?php
+                          $rate = $comment->rating;
 
-                  <div class="row mb-3">
-                    <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Email Notifications</label>
-                    <div class="col-md-8 col-lg-9">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="changesMade" checked>
-                        <label class="form-check-label" for="changesMade">
-                          Changes made to your account
-                        </label>
+                          if ($rate == 1) {
+                            echo '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                          } elseif ($rate == 2) {
+                            echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                          } elseif ($rate == 3) {
+                            echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                          } elseif ($rate == 4) {
+                            echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i> 
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                          } else {
+                            echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>';
+                          } ?>
+                        </div>
+
                       </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="newProducts" checked>
-                        <label class="form-check-label" for="newProducts">
-                          Information on new products and services
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="proOffers">
-                        <label class="form-check-label" for="proOffers">
-                          Marketing and promo offers
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="securityNotify" checked disabled>
-                        <label class="form-check-label" for="securityNotify">
-                          Security alerts
-                        </label>
-                      </div>
-                    </div>
+                    <?php endforeach ?>
                   </div>
 
-                  <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                  </div>
-                </form><!-- End settings Form -->
+                <?php } ?>
+
 
               </div>
 

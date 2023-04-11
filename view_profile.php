@@ -19,7 +19,7 @@ $_SESSION['technician_id'] = $user_details->id;
         if ($userCount > 0) {
             $user_details = $stmt->fetch();
             session_start();
-            $_SESSION['technician_id'] = $user_details->id;
+            $_SESSION['client_id'] = $user_details->id;
             header("Location: view_client_profile.php");
         }
     }

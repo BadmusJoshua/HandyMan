@@ -1,6 +1,5 @@
 <?php include 'inc/header/header.php';
 $review_submit = '';
-session_start();
 if (isset($_SESSION['technician_id'])) {
     $technician_id = $_SESSION['technician_id'];
     $sql = "SELECT * FROM technicians WHERE id = ?";
@@ -19,6 +18,24 @@ if (isset($_POST['comment'])) {
         $review_submit = 1;
     }
 }
+//fetch sum of ratings
+$sql = "SELECT sum(rating) AS TOTAL_RATING FROM reviews WHERE technician_id = $technician_id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$totalRating = $stmt->fetch(PDO::FETCH_NUM);
+$ratingSum = $totalRating[0];
+
+//fetch count of ratings
+$sql = "SELECT * FROM reviews WHERE technician_id = $technician_id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$totalCount = $stmt->rowCount();
+
+$rates = ($ratingSum / $totalCount);
+echo $rates;
+$sql = "UPDATE technicians SET rating = $rates WHERE id=$technician_id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
 ?>
 <!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
@@ -167,7 +184,87 @@ if (isset($_POST['comment'])) {
 
                             <div class="row">
                                 <div class="col-lg-3 col-md-4 label">Rating</div>
-                                <div class="col-lg-9 col-md-8"><?php echo $technician_details->job ?></div>
+                                <div class="col-lg-9 col-md-8"><?php $technician_details->rating;
+                                                                $rate = $technician_details->rating;
+echo $rate;
+                                                                if($rate==0){
+                                                        echo 'No reviews yet';
+                                                                } elseif ($rate == 1) {
+                                                                    echo '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate >= 1.5 && $rate  < 2) {
+                                                                    echo
+                                                                    '
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <i class="bi bi-star-half"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                        <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate == 2) {
+                                                                    echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate >= 2.5 && $rate < 3) {
+                                                                    echo
+                                                                    '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate == 3) {
+                                                                    echo '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate >= 3.5 && $rate < 4) {
+                                                                    echo
+                                                                    '
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate == 4) {
+                                                                    echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i> 
+                                                    <i class="bi bi-star"></i>
+                                                    ';
+                                                                } elseif ($rate >= 4.5 && $rate < 5) {
+                                                                    echo'
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-half"></i>
+                                                    ';
+                                                                } else {
+                                                                    echo '  
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>';
+                                                                }
+                                                                ?></div>
                             </div>
 
                             <div class="row">
