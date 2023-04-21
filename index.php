@@ -95,7 +95,7 @@ if ($totalCustomers != 0) {
     </li><!-- End Jobs Page Nav -->
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
+      <a class="nav-link collapsed" href="faq.php">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
       </a>
@@ -111,7 +111,7 @@ if ($totalCustomers != 0) {
 
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-login.html">
+      <a class="nav-link collapsed" href="login.php">
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Sign Out</span>
       </a>

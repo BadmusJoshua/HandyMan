@@ -147,19 +147,19 @@ $n = 1;
       </a>
     </li><!-- End Jobs Page Nav -->
 
+        <li class="nav-item">
+      <a class="nav-link collapsed" href="faq.php">
+        <i class="bi bi-question-circle"></i>
+        <span>F.A.Q</span>
+      </a>
+    </li><!-- End F.A.Q Page Nav -->
+
     <li class="nav-item">
       <a class="nav-link collapsed" href="contact.php">
         <i class="bi bi-envelope"></i>
         <span>Help Desk</span>
       </a>
     </li><!-- End Sign Out Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
-        <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
-      </a>
-    </li><!-- End F.A.Q Page Nav -->
 
     <li class="nav-item">
       <a class="nav-link collapsed" href="login.php">

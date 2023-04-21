@@ -44,6 +44,13 @@ if (isset($_POST['submit'])) {
     </li><!-- End Meeting Page Nav -->
 
     <li class="nav-item">
+      <a class="nav-link collapsed" href="jobs.php">
+        <i class="bi bi-briefcase-fill"></i>
+        <span>Jobs</span>
+      </a>
+    </li><!-- End Jobs Page Nav -->
+
+    <li class="nav-item">
       <a class="nav-link " href="contact.php">
         <i class="bi bi-envelope"></i>
         <span>Help Desk</span>
@@ -51,7 +58,7 @@ if (isset($_POST['submit'])) {
     </li><!-- End Help Desk Page Nav -->
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
+      <a class="nav-link collapsed" href="faq.php">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
       </a>
@@ -64,14 +71,6 @@ if (isset($_POST['submit'])) {
         <span>Sign Out</span>
       </a>
     </li><!-- End Sign Out Page Nav -->
-
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-blank.html">
-        <i class="bi bi-file-earmark"></i>
-        <span>Blank</span>
-      </a>
-    </li><!-- End Blank Page Nav -->
 
   </ul>
 

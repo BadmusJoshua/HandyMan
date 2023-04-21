@@ -16,14 +16,23 @@ if (isset($_SESSION['id'])) {
 } else {
     header("Location: register.php");
 }
-// if (isset($_GET['search'])) {
-//     $query = filter_Input(INPUT_POST, 'query', FILTER_SANITIZE_SPECIAL_CHARS);
-//     $sql = "SELECT * FROM technicians WHERE name LIKE ? ";// or address LIKE ? or name LIKE ? or company LIKE ? or username LIKE ? or email LIKE ?";
-//     $stmt = $pdo->prepare($sql);
-//     $stmt->execute(['%$query%']);//, '%$query%', '%$query%','%$query%','%$query%', '%$query%'
-//     $query_result = $stmt->fetchAll();
-//     header("Location: search.php");
-// }
+$sql = "SELECT * FROM notifications WHERE is_read=0 && user_id = $userId";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$notification_count = $stmt->rowCount();
+$fetch_notifications = $stmt->fetchAll();
+// return as JSON
+// return json_encode($notifications);
+//mark all notifications as seen
+if (isset($_POST['view_all'])) {
+    $sql = "UPDATE notifications SET is_read=1 WHERE user_id = $userId";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+}
+
+
+
+
 
 ?>
 <!DOCTYPE html>
@@ -77,7 +86,7 @@ if (isset($_SESSION['id'])) {
         <div class="search-bar justify-content-center">
             <form class="search-form d-flex align-items-center" method="POST" action="search.php">
                 <input type="text" name="query" placeholder="Enter Search Keyword">
-                <button   name="search"><i class="bi bi-search"></i></button>
+                <button name="search"><i class="bi bi-search"></i></button>
             </form>
         </div><!-- End Search Bar -->
 
@@ -88,79 +97,75 @@ if (isset($_SESSION['id'])) {
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
 
-                <!-- <li class="nav-item d-block d-lg-none">
+                <li class="nav-item d-block d-lg-none">
                     <a class="nav-link nav-icon search-bar-toggle " href="#">
                         <i class="bi bi-search"></i>
                     </a>
-                </li>End Search Icon --!>
+                </li>
+                <!-- End Search Icon  -->
 
                 <li class="nav-item dropdown">
 
-                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link nav-icon" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
-                        <span class="badge bg-primary badge-number">4</span>
+                        <span class="badge bg-primary badge-number" Id="notification_count"></span>
                     </a><!-- End Notification Icon -->
+
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
                         <li class="dropdown-header">
-                            You have 4 new notifications
-                            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                            <?php
+                            if ($notification_count > 1) {
+                                echo 'You have ' . $notification_count . ' new notifications';
+                            } elseif ($notification_count == 1) {
+                                echo 'You have ' . $notification_count . ' new notification';
+                            } else {
+                                echo 'You have no new notifications';
+                            }
+                            ?>
+                            <!-- Button to mark all notifications as read -->
+                            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
+                                <button class="badge rounded-pill bg-primary p-2 ms-2" name="view_all">View all</button>
+                            </form>
+
+                            <!-- <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a> -->
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li class="notification-item">
-                            <i class="bi bi-exclamation-circle text-warning"></i>
-                            <div>
-                                <h4>Lorem Ipsum</h4>
-                                <p>Quae dolorem earum veritatis oditseno</p>
-                                <p>30 min. ago</p>
-                            </div>
-                        </li>
+                        <?php
+                        foreach ($fetch_notifications as $notification) { ?>
+                            <li class="notification-item" id="<?= $notification->id ?>">
+                                <i class="bi bi-exclamation-circle text-warning"></i>
+                                <div>
+                                    <h4>Lorem Ipsum</h4>
+                                    <p><?= $notification->message ?></p>
+                                    <p>
+                                        <?php
+                                        $time = $notification->created_at;
+                                        $time1 = new DateTime($time); // create first time object
+                                        $current_date_time = new DateTime(); // create second time object
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                                        $interval = $time1->diff($current_date_time); // get difference as a DateInterval object
 
-                        <li class="notification-item">
-                            <i class="bi bi-x-circle text-danger"></i>
-                            <div>
-                                <h4>Atque rerum nesciunt</h4>
-                                <p>Quae dolorem earum veritatis oditseno</p>
-                                <p>1 hr. ago</p>
-                            </div>
-                        </li>
+                                        echo $interval->format('%h hours %i minutes'); // output the difference as hours and minutes
+                                        ?>
+                                    </p>
+                                    <button class="badge rounded-pill bg-primary p-2 ms-2" onclick="markAllAsRead()">Mark as
+                                        Read</button>
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                                </div>
+                            </li>
 
-                        <li class="notification-item">
-                            <i class="bi bi-check-circle text-success"></i>
-                            <div>
-                                <h4>Sit rerum fuga</h4>
-                                <p>Quae dolorem earum veritatis oditseno</p>
-                                <p>2 hrs. ago</p>
-                            </div>
-                        </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                        <?php } ?>
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
 
-                        <li class="notification-item">
-                            <i class="bi bi-info-circle text-primary"></i>
-                            <div>
-                                <h4>Dicta reprehenderit</h4>
-                                <p>Quae dolorem earum veritatis oditseno</p>
-                                <p>4 hrs. ago</p>
-                            </div>
-                        </li>
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+
                         <li class="dropdown-footer">
                             <a href="#">Show all notifications</a>
                         </li>
@@ -319,3 +324,19 @@ if (isset($_SESSION['id'])) {
     <!-- /**********
               * HEADER *
               **********/ -->
+    <script type="text/javascript">
+        //load notification counter 
+        function loadCount() {
+            setTimeout(function() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("notification_count").innerHTML = this.responseText;
+                    }
+                };
+                xhttp.open("GET", "notification_count.php", true);
+                xhttp.send();
+            }, 1000);
+        }
+        loadCount();
+    </script>

@@ -45,6 +45,12 @@ if (isset($_SESSION['client_id'])) {
             </a>
         </li><!-- End Jobs Page Nav -->
 
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="faq.php">
+                <i class="bi bi-question-circle"></i>
+                <span>F.A.Q</span>
+            </a>
+        </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
             <a class="nav-link collapsed" href="contact.php">
@@ -54,14 +60,7 @@ if (isset($_SESSION['client_id'])) {
         </li><!-- End Help Desk Page Nav -->
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-faq.html">
-                <i class="bi bi-question-circle"></i>
-                <span>F.A.Q</span>
-            </a>
-        </li><!-- End F.A.Q Page Nav -->
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-login.html">
+            <a class="nav-link collapsed" href="login.php">
                 <i class="bi bi-box-arrow-in-right"></i>
                 <span>Sign Out</span>
             </a>
