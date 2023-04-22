@@ -107,10 +107,10 @@ if (isset($_POST['view_all'])) {
 
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications overflow-auto" id="notificationContainer" style="max-height:60vh;">
-                        <li class="dropdown-header" id="">
+                        <!-- <li class="dropdown-header" id="">
 
                             <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                        </li>
+                        </li> -->
 
 
                     </ul><!-- End Notification Dropdown Items -->
@@ -301,13 +301,13 @@ if (isset($_POST['view_all'])) {
             const response = await fetch('notification_fetch.php');
             return response.json();
         }
-        var count = $('#notification_count').text();
-        if (count < 1) {
-            var prompt = `You have ${count} new notification `;
-        } else {
-            var prompt = `You have ${count} new notifications `;
-        }
-        document.getElementById('#prompt').innerText = prompt;
+        // var count = $('#notification_count').text();
+        // if (count < 1) {
+        //     var prompt = `You have ${count} new notification `;
+        // } else {
+        //     var prompt = `You have ${count} new notifications `;
+        // }
+        // document.getElementById('#prompt').innerText = prompt;
         document.getElementsByClassName('get_noti')[0].onclick = (ev) => {
             ev.preventDefault();
             console.log("eve")
@@ -318,7 +318,7 @@ if (isset($_POST['view_all'])) {
                 let notifications = ``;
                 data.data.forEach(item => {
                     notifications += `
-                      <li class="dropdown-header justify-content-between d-flex">
+                                          <li class="dropdown-header justify-content-between d-flex">
 <span id = "prompt"></span>
                             <!-- Button to mark all notifications as read -->
                             <form method="post" style="border:none;">
@@ -327,6 +327,7 @@ if (isset($_POST['view_all'])) {
 
                             <!-- <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a> -->
                         </li>
+
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -350,7 +351,7 @@ if (isset($_POST['view_all'])) {
                     `
                 })
 
-                container.append(notifications);
+                container.html(notifications);
             })
         }
     </script>
