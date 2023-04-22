@@ -12,17 +12,21 @@ if (isset($_POST['schedule'])) {
   $start_time = $_POST['s_time'];
   $finish_time = $_POST['f_time'];
   $meetingwith = $_POST['meeting_people'];
-      if (isset($_POST["reminder"]) && !empty($_POST["reminder"])) {
-        $reminderPermit = $_POST["reminder"];
-        if ($reminderPermit == 'yes') {
-          $reminder = $_POST['reminder_minutes'];
-        }
-        echo "You selected ".$reminder;
+  $venue = $_POST['venue'];
+  if (!empty($_POST['reminder'])) {
+    $reminderPermit = $_POST['reminder'];
+    if ($reminderPermit == 1) {
+      $reminder = $_POST['reminder_minutes'];
+    } else {
+      $reminder = 0;
+      $reminderPermit = 0;
     }
+    echo "You selected " . $reminder;
+  }
 
-  $sql = 'INSERT INTO meetings (date, start, end, personalities, owner_id, reminder) VALUES (?,?,?,?,?,?)';
+  $sql = 'INSERT INTO meetings (date, start, end, personalities, owner_id, reminder_minutes,reminder, venue) VALUES (?,?,?,?,?,?,?,?)';
   $stmt = $pdo->prepare($sql);
-  $stmt->execute([$input_date, $start_time,  $finish_time, $meetingwith,  $userId, $reminder]);
+  $stmt->execute([$input_date, $start_time,  $finish_time, $meetingwith,  $userId, $reminder, $reminderPermit, $venue]);
 }
 
 if (isset($_POST['reschedule'])) {
@@ -31,13 +35,13 @@ if (isset($_POST['reschedule'])) {
   $new_start_time = $_POST['new_s_time'];
   $new_finish_time = $_POST['new_f_time'];
   $new_meeting_with = $_POST['new_meeting_people'];
-  if (isset($_POST["reminder"]) && !empty($_POST["reminder"])) {
-        $reminderPermit = $_POST["reminder"];
-        if ($reminderPermit == 'yes') {
-          $reminder = $_POST['reminder_minutes'];
-        }
-        echo "You selected ".$reminder;
+  if (isset($_POST['reminder']) && !empty($_POST['reminder'])) {
+    $reminderPermit = $_POST['reminder'];
+    if ($reminderPermit == 'yes') {
+      $reminder = $_POST['reminder_minutes'];
     }
+    echo "You selected " . $reminder;
+  }
 
   $sql = "UPDATE meetings SET date = ?, start=?,end=?,personalities=?,reminder=? WHERE id =?";
   $stmt = $pdo->prepare($sql);
@@ -63,42 +67,44 @@ $n = 1;
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" class="justify-content-center">
-          <div class="row ">
-            <div class="col">
+        <form action="<?php htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post" class="justify-content-center needs-validation" novalidate>
+          <div class="row mb-2">
+            <div class="col-4">
               <label for="" class="form-label">Date:</label>
-              <input type="date" name="date" id="">
+              <input type="date" name="date" id="" class="form-control" required>
+            </div>
+            <div class="col-4">
+              <label for="" class="form-label">Start Time:</label>
+              <input type="time" name="s_time" id="" class="form-control" required>
+            </div>
+            <div class="col-4">
+              <label for="" class="form-label">Finish Time:</label>
+              <input type="time" name="f_time" id="" class="form-control" required>
             </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <label for="" class="form-label">Start Time</label>
-              <input type="time" name="s_time" id="">
-            </div>
-            <div class="col">
-              <label for="" class="form-label">Finish Time</label>
-              <input type="time" name="f_time" id="">
-            </div>
-          </div>
-          <div class="row">
+          <div class="row mb-2">
             <div class="col">
               <label for="" class="form-label">Personalities : </label>&nbsp;
-              <input type="text" name="meeting_people" id="">
+              <input type="text" name="meeting_people" id="" class="form-control" required>
             </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <label for="" class="form-label">Set Reminder :</label>
-              <input type="radio" name="reminder" value="yes" id="">Yes
-              <input type="radio" name="reminder" value="no" id="">No
-            </div>
+          <div class="row mb-2">
             <div class="col">
               <label for="" class="form-label">Venue :</label><br>
-              <input type="time" name="venue" id="" value="<?php echo $log->end ?>">
+              <!-- <input type="text" name="venue" id=""> -->
+              <textarea name="venue" id="" cols="5" rows="2" class="w-100 form-control" required></textarea>
             </div>
-            <div class="col">
+          </div>
+          <div class="row mb-2">
+            <div class="col-3">
+              <label for="" class="form-label">Set Reminder :</label>
+              <input type="radio" name="reminder" value="1" id="">Yes
+              <input type="radio" name="reminder" value="0" id="">No
+            </div>
+            <div class="col-9">
               <label for="" class="form-label">When should you be reminded?</label>
-              <select name="reminder_minutes" id="">
+              <select name="reminder_minutes" id="" class="form-control">
+                <option value=""></option>
                 <option value="10"> 10 minutes before meeting</option>
                 <option value="30">30 minutes before meeting</option>
                 <option value="45">45 minutes before meeting</option>
@@ -147,7 +153,7 @@ $n = 1;
       </a>
     </li><!-- End Jobs Page Nav -->
 
-        <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link collapsed" href="faq.php">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
@@ -199,6 +205,7 @@ $n = 1;
               <th scope="col">Starts</th>
               <th scope="col">Ends</th>
               <th scope="col">Personalities</th>
+              <th scope="col">Venue</th>
               <th scope="col">actions</th>
             </tr>
           </thead>
@@ -243,7 +250,27 @@ $n = 1;
                           </div>
                           <div class="col">
                             <label for="" class="form-label">Venue :</label><br>
+                            <input type="text" name="venue" id="" value="<?php echo $log->venue ?>">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <label for="" class="form-label">Set Reminder :</label>
+                            <input type="radio" name="reminder" value="yes" id="">Yes
+                            <input type="radio" name="reminder" value="no" id="">No
+                          </div>
+                          <div class="col">
+                            <label for="" class="form-label">Venue :</label><br>
                             <input type="time" name="venue" id="" value="<?php echo $log->end ?>">
+                          </div>
+                          <div class="col">
+                            <label for="" class="form-label">When should you be reminded?</label>
+                            <select name="reminder_minutes" id="">
+                              <option value="10"> 10 minutes before meeting</option>
+                              <option value="30">30 minutes before meeting</option>
+                              <option value="45">45 minutes before meeting</option>
+                              <option value="60">60 minutes before meeting</option>
+                            </select>
                           </div>
                         </div>
                         <div class="justify-content-center">
@@ -267,13 +294,6 @@ $n = 1;
                   $month_index = ($date_items[1] - 1);
                   $day = $date_items[2];
                   echo " $day $month[$month_index], $year";
-                  //Creating alarms for meetings
-                  //$today = date("F j, Y, g:i,a")
-                 // if (
-                   // $today == $meetingDay
-                  //) {
-                    # code...
-                 // }
                   ?>
                 </td>
                 <td>
@@ -319,6 +339,9 @@ $n = 1;
                 </td>
                 <td>
                   <?php echo $log->personalities; ?>
+                </td>
+                <td>
+                  <?php echo $log->venue; ?>
                 </td>
                 <td>
                   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop<?= $log->id; ?>">

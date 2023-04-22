@@ -1,38 +1,31 @@
 <?php include 'inc/config/database.php';
-session_start();
-if (isset($_SESSION['id'])) {
-    $userId = $_SESSION['id'];
-    $sql = "SELECT * FROM technicians WHERE id = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$userId]);
-    $detail = $stmt->fetch();
-    $job = $detail->job;
-    $name = ucwords($detail->name);
-    $name_array = explode(' ', $name);
-    $last_name = end($name_array);
-    $first_name = $name_array[0];
-    $initial = substr($first_name, 0, 1);
-    $official_name = "$initial . $last_name";
-} else {
-    header("Location: register.php");
-}
-$sql = "SELECT * FROM notifications WHERE is_read=0 && user_id = $userId";
+include_once 'reminder.php';
+
+$userId = $_SESSION['id'];
+$sql = "SELECT * FROM technicians WHERE id = ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$userId]);
+$detail = $stmt->fetch();
+$job = $detail->job;
+$name = ucwords($detail->name);
+$name_array = explode(' ', $name);
+$last_name = end($name_array);
+$first_name = $name_array[0];
+$initial = substr($first_name, 0, 1);
+$official_name = "$initial . $last_name";
+
+$sql = "SELECT * FROM notifications WHERE is_read=0 && user_id=$userId";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
+$content = $stmt->fetchAll();
 $notification_count = $stmt->rowCount();
-$fetch_notifications = $stmt->fetchAll();
-// return as JSON
-// return json_encode($notifications);
-//mark all notifications as seen
+
+
 if (isset($_POST['view_all'])) {
     $sql = "UPDATE notifications SET is_read=1 WHERE user_id = $userId";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
 }
-
-
-
-
 
 ?>
 <!DOCTYPE html>
@@ -62,6 +55,7 @@ if (isset($_POST['view_all'])) {
     <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <script src="assets/vendor/jquery.min.js"></script>
 
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet">
@@ -106,69 +100,15 @@ if (isset($_POST['view_all'])) {
 
                 <li class="nav-item dropdown">
 
-                    <a class="nav-link nav-icon" data-bs-toggle="dropdown">
+                    <a class="nav-link  get_noti nav-icon" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
                         <span class="badge bg-primary badge-number" Id="notification_count"></span>
                     </a><!-- End Notification Icon -->
 
 
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                        <li class="dropdown-header">
-                            <?php
-                            if ($notification_count > 1) {
-                                echo 'You have ' . $notification_count . ' new notifications';
-                            } elseif ($notification_count == 1) {
-                                echo 'You have ' . $notification_count . ' new notification';
-                            } else {
-                                echo 'You have no new notifications';
-                            }
-                            ?>
-                            <!-- Button to mark all notifications as read -->
-                            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
-                                <button class="badge rounded-pill bg-primary p-2 ms-2" name="view_all">View all</button>
-                            </form>
-
-                            <!-- <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a> -->
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <?php
-                        foreach ($fetch_notifications as $notification) { ?>
-                            <li class="notification-item" id="<?= $notification->id ?>">
-                                <i class="bi bi-exclamation-circle text-warning"></i>
-                                <div>
-                                    <h4>Lorem Ipsum</h4>
-                                    <p><?= $notification->message ?></p>
-                                    <p>
-                                        <?php
-                                        $time = $notification->created_at;
-                                        $time1 = new DateTime($time); // create first time object
-                                        $current_date_time = new DateTime(); // create second time object
-
-                                        $interval = $time1->diff($current_date_time); // get difference as a DateInterval object
-
-                                        echo $interval->format('%h hours %i minutes'); // output the difference as hours and minutes
-                                        ?>
-                                    </p>
-                                    <button class="badge rounded-pill bg-primary p-2 ms-2" onclick="markAllAsRead()">Mark as
-                                        Read</button>
-
-                                </div>
-                            </li>
-
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                        <?php } ?>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications overflow-auto" id="notificationContainer" style="max-height:60vh;">
 
 
-
-
-                        <li class="dropdown-footer">
-                            <a href="#">Show all notifications</a>
-                        </li>
 
                     </ul><!-- End Notification Dropdown Items -->
 
@@ -180,7 +120,7 @@ if (isset($_POST['view_all'])) {
               *********************/ -->
                 <li class="nav-item dropdown">
 
-                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                    <a class="nav-link nav-icon" data-bs-toggle="dropdown">
                         <i class="bi bi-chat-left-text"></i>
                         <span class="badge bg-success badge-number">3</span>
                     </a><!-- End Messages Icon -->
@@ -328,15 +268,83 @@ if (isset($_POST['view_all'])) {
         //load notification counter 
         function loadCount() {
             setTimeout(function() {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("notification_count").innerHTML = this.responseText;
+
+                fetch('notification_count.php').then(res => {
+                    console.log(res);
+                    if (res.ok) {
+                        return res.json();
+                    } else {
+                        throw (new Error);
                     }
-                };
-                xhttp.open("GET", "notification_count.php", true);
-                xhttp.send();
+                }).then(data => {
+                    console.log(data);
+                    document.getElementById("notification_count").innerHTML = data.count;
+                }).catch(e => {
+                    console.log(e);
+                })
+
+                // var xhttp = new XMLHttpRequest();
+                // xhttp.onreadystatechange = function() {
+                //     if (this.readyState == 4 && this.status == 200) {
+                //         document.getElementById("notification_count").innerHTML = this.responseText;
+                //     }
+                // };
+                // xhttp.open("GET", "notification_count.php", true);
+                // xhttp.send();
             }, 1000);
         }
         loadCount();
+
+        async function fetchNotifications() {
+            const response = await fetch('notification_fetch.php');
+            return response.json();
+        }
+
+        document.getElementsByClassName('get_noti')[0].onclick = (ev) => {
+            ev.preventDefault();
+            console.log("eve")
+            fetchNotifications().then(data => {
+                console.log(data);
+                const container = $('#notificationContainer');
+
+                let notifications = ``;
+                data.data.forEach(item => {
+                    notifications += `
+                      <li class="dropdown-header justify-content-between d-flex">
+
+                            <!-- Button to mark all notifications as read -->
+                            <form method="post" style="border:none;">
+                                <button class="badge rounded-pill bg-primary p-2 ms-2 border-0" name="view_all">View all</button>
+                            </form>
+
+                            <!-- <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a> -->
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li class="notification-item" id="${item.id}">
+                            <i class="bi bi-exclamation-circle text-warning"></i>
+                            <div>
+                                <h4>Message Prompt</h4>
+                                <p>${item.message}</p>
+                                <p>
+
+                                </p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li class="dropdown-footer">
+                            <a href="#">Show all notifications</a>
+                        </li>
+
+                    `
+                })
+
+                container.html(notifications);
+            })
+        }
     </script>

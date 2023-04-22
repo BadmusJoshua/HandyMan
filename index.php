@@ -9,10 +9,10 @@ $salesCount = $stmt->rowCount();
 
 // getting percentage increase of sales
 $prevSalesCount = $salesCount - 1;
-if ($salesCount != 0){
+if ($salesCount != 0) {
   $salesIncrease = (($salesCount - $prevSalesCount) / $salesCount) * 100;
-}else{
-  $salesIncrease =0;
+} else {
+  $salesIncrease = 0;
 }
 // echo ;
 // echo ;
@@ -38,10 +38,9 @@ $prevbalance = $totalPrevRevenue[0];
 //getting percentage increase in revenue
 if ($balance != 0) {
   $revenueIncrease = (($balance - $prevbalance) / $balance) * 100;
-}else{
+} else {
   $revenueIncrease = 0;
-  $balance=0;
-
+  $balance = 0;
 }
 
 
@@ -55,7 +54,6 @@ $totalCustomers = $stmt->rowCount();
 $prevCustomers = $totalCustomers - 1;
 if ($totalCustomers != 0) {
   $customerIncrease = (($totalCustomers - $prevCustomers) / $totalCustomers) * 100;
-
 } else {
   $customerIncrease = 0;
 }
@@ -165,9 +163,7 @@ if ($totalCustomers != 0) {
                   </div>
                   <div class="">
                     <h6><?php echo $salesCount ?></h6>
-                    <span class="text-success small pt-1 fw-bold"><?= (int)"$salesIncrease " 
-                    
-                    ?>%</span> <span class="text-muted small pt-2 ps-1">increase</span>
+                    <span class="text-success small pt-1 fw-bold"><?= (int)"$salesIncrease " ?>%</span> <span class="text-muted small pt-2 ps-1">increase</span>
 
                   </div>
                 </div>
@@ -271,10 +267,10 @@ if ($totalCustomers != 0) {
 
                 <!-- Line Chart -->
                 <div id="reportsChart"></div>
-<?php 
-$sql="SELECT * FROM jobs WHERE seller_id =$userId ";
-$stmt
-?>
+                <?php
+                $sql = "SELECT * FROM jobs WHERE seller_id =$userId ";
+                $stmt
+                ?>
                 <script>
                   document.addEventListener("DOMContentLoaded", () => {
                     new ApexCharts(document.querySelector("#reportsChart"), {
@@ -370,7 +366,7 @@ $stmt
                   </tr>
                 </thead>
                 <tbody>
-                 
+
                   <?php
                   $sql = "SELECT DISTINCT * FROM jobs WHERE seller_id=? ORDER BY price DESC ";
                   $stmt = $pdo->prepare($sql);

@@ -4,9 +4,6 @@ include_once 'inc/config/database.php';
 use PHPMailer\PHPMailer\PHPMailer;
 
 $account_not_found = $message_unsent = $message_sent = "";
-
-
-
 require 'PHPMailer/src/Exception.php';
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
