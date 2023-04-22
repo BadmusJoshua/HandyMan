@@ -299,7 +299,7 @@ if (isset($_POST['view_all'])) {
             const response = await fetch('notification_fetch.php');
             return response.json();
         }
-
+        var notification_count = document.getElementById("#notification_count").innerHTML;
         document.getElementsByClassName('get_noti')[0].onclick = (ev) => {
             ev.preventDefault();
             console.log("eve")
@@ -311,7 +311,7 @@ if (isset($_POST['view_all'])) {
                 data.data.forEach(item => {
                     notifications += `
                       <li class="dropdown-header justify-content-between d-flex">
-
+You have new notifications
                             <!-- Button to mark all notifications as read -->
                             <form method="post" style="border:none;">
                                 <button class="badge rounded-pill bg-primary p-2 ms-2 border-0" name="view_all">View all</button>
@@ -328,9 +328,25 @@ if (isset($_POST['view_all'])) {
                             <div>
                                 <h4>Message Prompt</h4>
                                 <p>${item.message}</p>
-                                <p>
+                                
+//                                    // assuming time1 and time2 are valid time strings in HH:MM:SS format
+// const time1 = '${item.created_at}';
+// const time2 = '18:45:30';
 
-                                </p>
+// // convert time strings to Date objects
+// const d1 = new Date('2000-01-01T' + time1 + 'Z');
+// const d2 = new Date('2000-01-01T' + time2 + 'Z');
+
+// // calculate time difference in milliseconds
+// const diffInMs = Math.abs(d2 - d1);
+
+// // convert time difference from milliseconds to hours, minutes and seconds
+// const diffInHrs = Math.floor(diffInMs / 3600000); // 1 Hour = 60 Minutes * 60 Seconds * 1000 Milliseconds
+// const diffInMins = Math.floor((diffInMs % 3600000) / 60000); // 1 Minute = 60 Seconds * 1000 Milliseconds
+// const diffInSecs = Math.floor(((diffInMs % 3600000) % 60000) / 1000);
+// var difference = "diffInHrs hours , diffInMins mins, diffInSecs secs ago";
+// document.getElementById("#time_difference").innerHTML= difference;
+//                               <p id="time_difference">  </p>
                             </div>
                         </li>
 
