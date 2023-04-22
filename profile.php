@@ -163,7 +163,7 @@ if (isset($_POST['changePassword'])) {
 
         <div class="card">
           <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-            <img src="assets/<?= "images/$profileImage" ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile" class="" style="height:130px; width:180px;border-radius:50%;">
+            <img src="assets/<?= "images/$profileImage" ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile" class="" style="height:130px; width:130px;border-radius:50%;">
             <h2><?php echo $detail->name ?></h2>
             <h3><?php echo $detail->job ?></h3>
             <div class="social-links mt-2">
@@ -346,7 +346,7 @@ if (isset($_POST['changePassword'])) {
                   <div class="row mb-3">
                     <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                     <div class="col-md-8 col-lg-9">
-                      <img src="assets/images/<?php echo $profileImage ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile Photo" class="rounded-circle">
+                      <img src="assets/images/<?php echo $profileImage ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile Photo" class="rounded-circle" style="height:130px; width:130px;border-radius:50%;">
                       <div class="pt-2">
                         <input type="file" name="profileImage" class="form-control" id="">
                       </div>

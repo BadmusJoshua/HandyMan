@@ -37,10 +37,10 @@ $no_result = '';
         </li><!-- End Jobs Page Nav -->
 
         <li class="nav-item">
-        <a class="nav-link collapsed" href="faq.php">
-            <i class="bi bi-question-circle"></i>
-            <span>F.A.Q</span>
-        </a>
+            <a class="nav-link collapsed" href="faq.php">
+                <i class="bi bi-question-circle"></i>
+                <span>F.A.Q</span>
+            </a>
         </li><!-- End F.A.Q Page Nav -->
 
         <li class="nav-item">
@@ -75,13 +75,13 @@ $no_result = '';
     <section class="section dashboard" style="position:relative;">
         <div class="row">
             <?php
-if ($no_result) {
+            if ($no_result) {
                 echo '<div class="alert alert-danger text-center alert-dismissible fade show" role="alert">
                           No Result Found! 
                           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                           
                         </div>  ';
-}
+            }
 
             if (isset($_POST['search'])) {
                 $query = filter_input(INPUT_POST, 'query', FILTER_SANITIZE_FULL_SPECIAL_CHARS);

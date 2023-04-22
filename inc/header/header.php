@@ -107,11 +107,6 @@ if (isset($_POST['view_all'])) {
 
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications overflow-auto" id="notificationContainer" style="max-height:60vh;">
-                        <!-- <li class="dropdown-header" id="">
-
-                            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                        </li> -->
-
 
                     </ul><!-- End Notification Dropdown Items -->
 
@@ -121,71 +116,7 @@ if (isset($_POST['view_all'])) {
                 <!-- /*********************
               * POST NOTIFICATION *
               *********************/ -->
-                <li class="nav-item dropdown">
 
-                    <a class="nav-link nav-icon" data-bs-toggle="dropdown">
-                        <i class="bi bi-chat-left-text"></i>
-                        <span class="badge bg-success badge-number">3</span>
-                    </a><!-- End Messages Icon -->
-
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
-                        <li class="dropdown-header">
-                            You have 3 new messages
-                            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="message-item">
-                            <a href="#">
-                                <img src="assets/img/messages-1.jpg" alt="" class="rounded-circle">
-                                <div>
-                                    <h4>Maria Hudson</h4>
-                                    <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                                    <p>4 hrs. ago</p>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="message-item">
-                            <a href="#">
-                                <img src="assets/img/messages-2.jpg" alt="" class="rounded-circle">
-                                <div>
-                                    <h4>Anna Nelson</h4>
-                                    <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                                    <p>6 hrs. ago</p>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="message-item">
-                            <a href="#">
-                                <img src="assets/img/messages-3.jpg" alt="" class="rounded-circle">
-                                <div>
-                                    <h4>David Muldon</h4>
-                                    <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
-                                    <p>8 hrs. ago</p>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="dropdown-footer">
-                            <a href="#">Show all messages</a>
-                        </li>
-
-                    </ul><!-- End Messages Dropdown Items -->
-
-                </li><!-- End Messages Nav -->
                 <!-- /*********************
           * POST NOTIFICATION *
           *********************/ -->
@@ -197,7 +128,7 @@ if (isset($_POST['view_all'])) {
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="assets/images/<?php echo $detail->image ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile" class="rounded-circle">
+                        <img src="assets/images/<?php echo $detail->image ?>" onerror="this.src='assets/img/profile-img.jpg'" alt="Profile" class="rounded-circle" style="height:30px;width:30px;">
                         <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $official_name; ?></span>
                     </a><!-- End Profile Iamge Icon -->
 
@@ -286,14 +217,6 @@ if (isset($_POST['view_all'])) {
                     console.log(e);
                 })
 
-                // var xhttp = new XMLHttpRequest();
-                // xhttp.onreadystatechange = function() {
-                //     if (this.readyState == 4 && this.status == 200) {
-                //         document.getElementById("notification_count").innerHTML = this.responseText;
-                //     }
-                // };
-                // xhttp.open("GET", "notification_count.php", true);
-                // xhttp.send();
             }, 1000);
         }
         loadCount();
@@ -301,57 +224,88 @@ if (isset($_POST['view_all'])) {
             const response = await fetch('notification_fetch.php');
             return response.json();
         }
-        // var count = $('#notification_count').text();
-        // if (count < 1) {
-        //     var prompt = `You have ${count} new notification `;
-        // } else {
-        //     var prompt = `You have ${count} new notifications `;
-        // }
-        // document.getElementById('#prompt').innerText = prompt;
+
         document.getElementsByClassName('get_noti')[0].onclick = (ev) => {
             ev.preventDefault();
-            console.log("eve")
             fetchNotifications().then(data => {
-                console.log(data);
+                // console.log(data);
                 const container = $('#notificationContainer');
 
-                let notifications = ``;
-                data.data.forEach(item => {
-                    notifications += `
-                                          <li class="dropdown-header justify-content-between d-flex">
-<span id = "prompt"></span>
-                            <!-- Button to mark all notifications as read -->
-                            <form method="post" style="border:none;">
-                                <button class="badge rounded-pill bg-primary p-2 ms-2 border-0" name="view_all">View all</button>
-                            </form>
+                let count = $(document).find($('#notification_count')).html();
+                // console.log(count);
+                var prompt = ` `;
+                if (count == 0) {
 
-                            <!-- <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a> -->
-                        </li>
+                    prompt += `<li class = "dropdown-header justify-content-between d-flex"
+                    id = "notification_header" >You have no new notification </li> `;
+                    container.html(prompt);
+                } else if (count == 1) {
+                    prompt += `<li class = "dropdown-header justify-content-between d-flex"
+                    id = "notification_header" >You have ${count} new notification </li> `;
 
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                    notifications = `${prompt}`;
+                    data.data.forEach(item => {
+                        notifications += `
 
-                        <li class="notification-item" id="${item.id}">
-                            <i class="bi bi-exclamation-circle text-warning"></i>
-                            <div>
-                                <h4>Message Prompt</h4>
-                                <p>${item.message}</p>
-                                
-                            </div>
-                        </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
 
-                        <li>
-                            <hr class="dropdown-divider">
+                <li class="notification-item" id="${item.id}">
+                    <i class="bi bi-exclamation-circle text-warning"></i>
+                    <div>
+                        <p>${item.message}</p>
+                        <p>${item.created_at}</p>  
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="dropdown-footer">
+                    <a href="#">Show all notifications</a>
+                </li>
+        
+             `;
+
+                    })
+                } else {
+
+                    prompt += `<li class = "dropdown-header justify-content-between d-flex"
+                    id = "notification_header" >You have ${count} new notifications </li> `;
+
+                    notifications = `${prompt}`;
+                    data.data.forEach(item => {
+                            notifications += `
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <li class="notification-item" id="${item.id}">
+                    <i class="bi bi-exclamation-circle text-warning"></i>
+                    <div>
+                        <p>${item.message}</p>
+                        <p>${item.created_at}</p>  
+                    </div>
+                </li>
+        
+             `;
+
+                        }
+
+                    )
+
+                    notifications += `<li>
+                    <hr class="dropdown-divider">
                         </li>
                         <li class="dropdown-footer">
-                            <a href="#">Show all notifications</a>
-                        </li>
+                    <a href="#">Show all notifications</a>
+                </li>`;
+                    container.html(notifications);
 
-                    `
-                })
 
-                container.html(notifications);
+                }
             })
         }
     </script>
